@@ -1,11 +1,14 @@
 #ifndef _2165_DRIVESUBSYSTEM_H_
 #define _2165_DRIVESUBSYSTEM_H_
 
+#include <utility>
 
 #include <frc2/command/SubsystemBase.h>
 #include <ctre/Phoenix.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
+#include <frc/Ultrasonic.h>
+
 
 class DriveSubsystem : public frc2::SubsystemBase {
 private:
@@ -19,6 +22,16 @@ private:
 
     frc::DifferentialDrive drivetrain;
 
+    frc::Ultrasonic ultrasonic;
+
+public: 
+    DriveSubsystem();
+    DriveSubsystem(int rf, int rr, int lf, int lr, std::pair<int, int> ultrasonic);
+
+    void arcadeDrive(double speed, double rotation);
+    void setMaxSpeed(double max);
+
+    double getUltrasonicDistance();
 };
 
 
