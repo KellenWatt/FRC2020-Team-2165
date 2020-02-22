@@ -26,10 +26,10 @@ private:
   static constexpr double speedOfSoundInchesPerSec  = 13660.0;
   static constexpr double speedOfSoundMMPerSec = speedOfSoundInchesPerSec * 25.4;
 
-  UnitType measureUnit;
-
   frc::Counter counter;
   frc::DigitalOutput echo;
+
+  UnitType measureUnit;
 
   bool isValidRange();
 

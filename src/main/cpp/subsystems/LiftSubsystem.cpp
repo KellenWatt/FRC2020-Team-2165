@@ -20,5 +20,5 @@ void LiftSubsystem::stop() {
 }
 
 double LiftSubsystem::getHeight() {
-    heightSonar.getRange();
+    return heightSonar.getRange();
 }

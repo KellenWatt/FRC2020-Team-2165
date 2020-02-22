@@ -20,6 +20,6 @@ public:
     void stop();
     double getHeight();
 
-}
+};
 
 #endif
