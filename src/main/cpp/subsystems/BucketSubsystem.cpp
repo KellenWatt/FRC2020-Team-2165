@@ -1,4 +1,4 @@
-#include "susbystems/BucketSubsystem"
+#include "subsystems/BucketSubsystem"
 
 #include <frc/DoubleSolenoid.h>
 
@@ -25,7 +25,7 @@ bool BucketSubsystem::isRaised() {
 
 bool BucketSubsystem::isPopped() {
     return popper.Get()
-}
+} 
 
 bool BucketSubsystem::hasBall() {
     return ballCheck.Get();

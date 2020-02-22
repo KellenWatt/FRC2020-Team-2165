@@ -1,7 +1,7 @@
 #ifndef _2165_LIFTSUBSYSTEM_H_
 #define _2165_LIFTSUBSYSTEM_H_
 
-#include <frc2/SubsystemBase.h>
+#include <frc2/command/SubsystemBase.h>
 #include <ctre/Phoenix.h>
 #include "components/Ultrasonic.h"
 
