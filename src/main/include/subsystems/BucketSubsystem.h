@@ -6,6 +6,6 @@
 
 class BucketSubsystem : public frc2::SubsystemBase {
 
-}
+};
 
 #endif
