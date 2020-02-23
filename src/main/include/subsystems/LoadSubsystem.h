@@ -10,18 +10,23 @@
 
 class LoadSubsystem : public frc2::SubsystemBase {
 private:
-    WPI_TalonSRX loadBelt;
-    WPI_TalonSRX loaderArm;
-    frc::DoubleSolenoid armMover;
+    WPI_TalonSRX loaderBelt;
+    WPI_TalonSRX captureRoller;
+    frc::DoubleSolenoid captureArm;
+
+    double beltSpeed;
+    double captureRollerSpeed;
 public:
+    LoadSubsystem(int beltChannel, int loaderArmChannel, std::pair<int,int> captureArmChannels);
 
     void lowerCaptureArm(bool lowered);
     void enableBelt(bool enabled);
-    void enableCaptureArm(bool enabled);
+    void enableCaptureRoller(bool enabled);
+
+    void setBeltSpeed(double speed);
+    void setCaptureRollerSpeed(double speed);
 
     bool armLowered();
-    bool beltEnabled();
-    bool armEnabled();
 };
 
 #endif
