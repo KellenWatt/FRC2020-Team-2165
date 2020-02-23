@@ -15,10 +15,10 @@ private:
 
     frc::DigitalInput armsUp;
     frc::DigitalInput armsDown;
-
+/*
     frc::Servo hookReleaseLeft;
     frc::Servo hookReleaseRight;
-
+*/
 public:
 
     ArmSubsystem();
@@ -29,7 +29,7 @@ public:
     void lower(double speed);
     void fullStop();
 
-    void releaseHook(bool release);
+//    void releaseHook(bool release);
 
     bool fullRaised();
     bool fullLowered();
