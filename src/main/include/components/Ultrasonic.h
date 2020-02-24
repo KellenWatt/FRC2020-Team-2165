@@ -7,7 +7,6 @@
 
 #pragma once
 //#include <frc/WPILib.h>
-#include <math.h>
 #include <frc/Counter.h>
 #include <frc/DigitalInput.h>
 #include <frc/DigitalOutput.h>
