@@ -13,6 +13,8 @@ private:
 
     WPI_TalonSRX armMotor;
 
+    // May not be necessary, as switches might be directly wired to Talon. 
+    // Keeping because it literally can't hurt, as long as they're `false` by default
     frc::DigitalInput armsUp;
     frc::DigitalInput armsDown;
 /*
