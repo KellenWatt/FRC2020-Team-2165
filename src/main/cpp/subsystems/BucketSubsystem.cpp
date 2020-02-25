@@ -22,7 +22,7 @@ bool BucketSubsystem::isRaised() {
 }
 
 bool BucketSubsystem::isPopped() {
-    return this->popper.Get();
+    return this->popper.Get() == frc::DoubleSolenoid::Value::kForward;
 } 
 
 bool BucketSubsystem::hasBall() {
