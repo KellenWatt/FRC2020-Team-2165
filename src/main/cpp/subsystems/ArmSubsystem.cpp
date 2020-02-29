@@ -2,7 +2,11 @@
 
 ArmSubsystem::ArmSubsystem() : ArmSubsystem::ArmSubsystem(0,0,0) {}
 
-ArmSubsystem::ArmSubsystem(int motor, int up, int down) : armMotor(motor), armsUp(up), armsDown(down) {}
+ArmSubsystem::ArmSubsystem(int motor, int up, int down) : armMotor(motor), armsUp(up), armsDown(down) {
+    // Configures the pins on the Talons
+    this->armMotor.ConfigForwardLimitSwitchSource(LimitSwitchSource::LimitSwitchSource_FeedbackConnector, LimitSwitchNormal::LimitSwitchNormal_NormallyOpen, 0);
+    this->armMotor.ConfigReverseLimitSwitchSource(LimitSwitchSource::LimitSwitchSource_FeedbackConnector, LimitSwitchNormal::LimitSwitchNormal_NormallyOpen, 0);
+}
 
 /*
 ArmSubsystem::ArmSubsystem(int motor, int up, int down, int hookLeft, int hookRight) :

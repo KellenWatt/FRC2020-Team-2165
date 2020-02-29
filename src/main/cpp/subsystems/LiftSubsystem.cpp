@@ -2,9 +2,12 @@
 
 #include <utility>
 
-LiftSubsystem::LiftSubsystem(int winchChannel, std::pair<int,int> sonarChannels) :
-        winch(winchChannel), heightSonar(sonarChannels.first, sonarChannels.second) {
-    this->heightSonar.enable(true);
+LiftSubsystem::LiftSubsystem(int winchChannel, int sonarChannel) :
+        winch(winchChannel), heightIR(sonarChannel) {
+    //this->heightIR.enable(true);
+    // configures the pins on the Talons
+    this->winch.ConfigForwardLimitSwitchSource(LimitSwitchSource::LimitSwitchSource_FeedbackConnector, LimitSwitchNormal::LimitSwitchNormal_NormallyOpen, 0);
+    this->winch.ConfigReverseLimitSwitchSource(LimitSwitchSource::LimitSwitchSource_FeedbackConnector, LimitSwitchNormal::LimitSwitchNormal_NormallyOpen, 0);
 }
 
 void LiftSubsystem::raise(double speed) {
@@ -20,5 +23,5 @@ void LiftSubsystem::stop() {
 }
 
 double LiftSubsystem::getHeight() {
-    return this->heightSonar.getRange();
+    return this->heightIR.GetValue() / 1000; // No idea why this is, but it is.
 }
