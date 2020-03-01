@@ -12,12 +12,16 @@
 #include <frc2/command/InstantCommand.h>
 #include <frc2/command/ParallelRaceGroup.h>
 #include <frc2/command/RunCommand.h>
+#include <frc2/command/StartEndCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/WaitCommand.h>
 #include <frc2/command/WaitUntilCommand.h>
 #include <frc/XboxController.h>
+#include <frc2/command/button/JoystickButton.h>
+#include <frc2/command/button/Trigger.h>
 
 #include <utility>
+#include <cmath>
 
 RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller(0), 
     armSubsystem(0,1,2), 
@@ -39,8 +43,66 @@ RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
-
+  // LB + Y -> raise arms manually
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) &&
+   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kY)))
+  .WhileActiveContinous([this] {this->armSubsystem.raise(1.0);},
+                        {&(this->armSubsystem)});
   
+  // LB + X -> lower arms manually
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) &&
+   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kX)))
+  .WhileActiveContinous([this] {this->armSubsystem.lower(1.0);},
+                        {&(this->armSubsystem)});
+  
+  // LB + Right-Y -> move arms manually
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) && 
+   frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand) > 0.1);}))
+  .WhileActiveContinous([this] {this->armSubsystem.raise(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand));},
+                        {&(this->armSubsystem)});
+  
+  // RB + Y -> raise winch manually
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
+   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kY)))
+  .WhileActiveContinous([this] {this->liftSubsystem.raise(1.0);},
+                        {&(this->liftSubsystem)});
+
+  // RB + X -> lower winch manually
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
+   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kX)))
+  .WhileActiveContinous([this] {this->liftSubsystem.lower(1.0);},
+                        {&(this->liftSubsystem)});
+
+  // Start + Select -> Run winch program, lift automatically
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBack)) &&
+   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStart)))
+  .WhenActive(frc2::RunCommand([this] {this->liftSubsystem.raise(1.0 * (this->liftSubsystem.getHeight() < 1.0));}, 
+                               {&(this->liftSubsystem)}));
+
+  // Toggle A -> full enable/disable loader
+  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kA))
+  .ToggleWhenPressed(frc2::RunCommand([this] {this->loadSubsystem.lowerCaptureArm(true);
+                                        this->loadSubsystem.enableBelt(true);
+                                        this->loadSubsystem.enableCaptureRoller(true);
+                                      }, {&(this->loadSubsystem)})
+                     .AndThen([this] {this->loadSubsystem.lowerCaptureArm(false);
+                                this->loadSubsystem.enableBelt(false);
+                                this->loadSubsystem.enableCaptureRoller(false);
+                              }));
+
+  // Hold B -> Raise/Lower bucket
+  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kB))
+  .WhenActive([this] {this->bucketSubsystem.raiseBucket(true);}, {&(this->bucketSubsystem)})
+  .WhenInactive([this] {this->bucketSubsystem.raiseBucket(false);}, {&(this->bucketSubsystem)});
+
+  // Right stick -> activate popper
+  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStickRight))
+  .WhenActive([this] {this->bucketSubsystem.popArm(true);}, {&(this->bucketSubsystem)})
+  .WhenInactive([this] {this->bucketSubsystem.popArm(false);}, {&(this->bucketSubsystem)});
+
+
+
+
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
