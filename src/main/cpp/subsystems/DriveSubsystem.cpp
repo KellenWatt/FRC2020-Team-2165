@@ -24,15 +24,17 @@ void DriveSubsystem::turnToAngle(double angle) {
 }
 
 void DriveSubsystem::turnToAngleAtSpeed(double angle, double speed) {
-    double diff = angle - gyro.GetAngle();
-
-    if(abs(diff) > 0.5) {
+    if(!this->atAngle(angle)) {
         this->drivetrain.ArcadeDrive(0, (angle < 0 ? -1 : 1) * speed);
     }
 }
 
 double DriveSubsystem::getAngle() {
     return this->gyro.GetAngle();
+}
+
+bool DriveSubsystem::atAngle(double angle) {
+    return abs(angle - this->gyro.GetAngle()) < 0.5;
 }
 
 void DriveSubsystem::setMaxSpeed(double max) {

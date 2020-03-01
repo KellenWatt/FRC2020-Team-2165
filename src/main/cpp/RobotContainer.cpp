@@ -110,7 +110,7 @@ void RobotContainer::ConfigureButtonBindings() {
   .WhenActive(frc2::SequentialCommandGroup(
                 frc2::InstantCommand([this] {this->driveSubsystem.resetGyro();}),
                 frc2::RunCommand([this] {this->driveSubsystem.turnToAngle(180);})
-  ).WithInterrupt([this] {return abs(180 - this->driveSubsystem.getAngle()) < 0.5;}), {&(this->driveSubsystem)});
+  ).WithInterrupt([this] {return this->driveSubsystem.atAngle(180);}), {&(this->driveSubsystem)});
 
 }
 

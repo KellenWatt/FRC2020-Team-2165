@@ -35,6 +35,7 @@ public:
     void turnToAngleAtSpeed(double angle, double speed);
 
     double getAngle();
+    bool atAngle(double angle);
 
     void setMaxSpeed(double max);
     void resetGyro();
