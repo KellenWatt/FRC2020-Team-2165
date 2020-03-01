@@ -38,7 +38,8 @@ RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller
   driveSubsystem.SetDefaultCommand(frc2::RunCommand([this] {
     this->driveSubsystem.arcadeDrive(this->controller.GetY(frc::GenericHID::kLeftHand),
                                  this->controller.GetX(frc::GenericHID::kRightHand));
-  }, {&driveSubsystem}));
+  }, {&(this->driveSubsystem)}));
+
 }
 
 void RobotContainer::ConfigureButtonBindings() {
@@ -77,7 +78,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Start + Select -> Run winch program, lift automatically
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBack)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStart)))
-  .WhenActive(frc2::RunCommand([this] {this->liftSubsystem.raise(1.0 * (this->liftSubsystem.getHeight() < 1.0));}, 
+  .ToggleWhenActive(frc2::RunCommand([this] {this->liftSubsystem.raise(1.0 * (this->liftSubsystem.getHeight() < 1.0));}, 
                                {&(this->liftSubsystem)}));
 
   // Toggle A -> full enable/disable loader
