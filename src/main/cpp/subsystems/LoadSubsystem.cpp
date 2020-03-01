@@ -7,7 +7,8 @@
 LoadSubsystem::LoadSubsystem(int beltChannel, int captureRollerChannel, std::pair<int,int> captureArmChannels) :
         loaderBelt(beltChannel), captureRoller(captureRollerChannel), 
         captureArm(captureArmChannels.first, captureArmChannels.second) {
-
+    this->beltSpeed = 1.0;
+    this->captureRollerSpeed = 1.0;
 }
 
 void LoadSubsystem::lowerCaptureArm(bool lowered) {
