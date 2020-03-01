@@ -19,15 +19,16 @@
 #include <frc/XboxController.h>
 #include <frc2/command/button/JoystickButton.h>
 #include <frc2/command/button/Trigger.h>
-#include <units/units.h>
 
+
+#include <units/units.h>
 #include <utility>
 #include <cmath>
 
 RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller(0), 
     armSubsystem(0,1,2), 
     bucketSubsystem(std::pair<int,int>(0,1), std::pair<int,int>(2,3), 5),
-    driveSubsystem(2,5,3,6, std::pair<int,int>(4,8)), 
+    driveSubsystem(2,5,3,6), 
     liftSubsystem(0, 6), 
     loadSubsystem(7,8, std::pair<int,int>(4,5)) {
   // Initialize all of your commands and subsystems here
@@ -92,8 +93,8 @@ void RobotContainer::ConfigureButtonBindings() {
   .WhenActive([this] {this->bucketSubsystem.raiseBucket(true);}, {&(this->bucketSubsystem)})
   .WhenInactive([this] {this->bucketSubsystem.raiseBucket(false);}, {&(this->bucketSubsystem)});
 
-  // Right stick -> activate/deactivate popper manually
-  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStickRight))
+  // Left stick -> activate/deactivate popper manually
+  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStickLeft))
   .WhenActive([this] {this->bucketSubsystem.popArm(true);}, {&(this->bucketSubsystem)})
   .WhenInactive([this] {this->bucketSubsystem.popArm(false);}, {&(this->bucketSubsystem)});
 
@@ -104,6 +105,12 @@ void RobotContainer::ConfigureButtonBindings() {
                 frc2::InstantCommand([this] {this->bucketSubsystem.popArm(true);}, {&(this->bucketSubsystem)})
   ).AndThen([this] {this->bucketSubsystem.popArm(false);}));
 
+  // Right stick -> 180 spin
+  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStickRight))
+  .WhenActive(frc2::SequentialCommandGroup(
+                frc2::InstantCommand([this] {this->driveSubsystem.resetGyro();}),
+                frc2::RunCommand([this] {this->driveSubsystem.turnToAngle(180);})
+  ).WithInterrupt([this] {return abs(180 - this->driveSubsystem.getAngle()) < 0.5;}), {&(this->driveSubsystem)});
 
 }
 

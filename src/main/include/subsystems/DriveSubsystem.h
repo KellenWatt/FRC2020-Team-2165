@@ -9,6 +9,8 @@
 #include <frc/drive/DifferentialDrive.h>
 #include <frc/Ultrasonic.h>
 
+#include <AHRS.h>
+
 
 class DriveSubsystem : public frc2::SubsystemBase {
 private:
@@ -22,16 +24,20 @@ private:
 
     frc::DifferentialDrive drivetrain;
 
-    frc::Ultrasonic ultrasonic;
+    AHRS gyro;
 
 public: 
     DriveSubsystem();
-    DriveSubsystem(int rf, int rr, int lf, int lr, std::pair<int, int> ultrasonic);
+    DriveSubsystem(int rf, int rr, int lf, int lr);
 
     void arcadeDrive(double speed, double rotation);
-    void setMaxSpeed(double max);
+    void turnToAngle(double angle);
+    void turnToAngleAtSpeed(double angle, double speed);
 
-    double getUltrasonicDistance();
+    double getAngle();
+
+    void setMaxSpeed(double max);
+    void resetGyro();
 };
 
 
