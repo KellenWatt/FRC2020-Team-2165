@@ -23,6 +23,8 @@ public:
     void enableBelt(bool enabled);
     void enableCaptureRoller(bool enabled);
 
+    void fullEnable(bool enabled);
+
     void setBeltSpeed(double speed);
     void setCaptureRollerSpeed(double speed);
 

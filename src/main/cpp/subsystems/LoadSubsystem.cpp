@@ -23,6 +23,12 @@ void LoadSubsystem::enableCaptureRoller(bool enabled) {
     this->captureRoller.Set(enabled * this->captureRollerSpeed);
 }
 
+void LoadSubsystem::fullEnable(bool enabled) {
+    this->lowerCaptureArm(enabled);
+    this->enableBelt(enabled);
+    this->enableCaptureRoller(enabled);
+}
+
 void LoadSubsystem::setBeltSpeed(double speed) {
     this->beltSpeed = speed;
 }
