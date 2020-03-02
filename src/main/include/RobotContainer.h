@@ -49,5 +49,7 @@ class RobotContainer {
   LiftSubsystem liftSubsystem;
   LoadSubsystem loadSubsystem;
 
+  bool endgameEnabled;
+
   void ConfigureButtonBindings();
 };
