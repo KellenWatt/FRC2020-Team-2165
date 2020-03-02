@@ -79,9 +79,6 @@ void RobotContainer::ConfigureButtonBindings() {
   .WhenActive([this] {this->bucketSubsystem.raiseBucket(true);}, {&(this->bucketSubsystem)})
   .WhenInactive([this] {this->bucketSubsystem.raiseBucket(false);}, {&(this->bucketSubsystem)});
 
-  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight))
-  .WhenActive([this] {this->driveSubsystem.arcadeDrive(0, 0.8);}, {&(this->driveSubsystem)});
-
   // Photo sensor -> activate/deactivate popper automatically
   frc2::Trigger([this] {return this->bucketSubsystem.hasBall();})
   .WhenActive(frc2::SequentialCommandGroup(
