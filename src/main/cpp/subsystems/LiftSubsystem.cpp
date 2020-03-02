@@ -11,11 +11,12 @@ LiftSubsystem::LiftSubsystem(int winchChannel, int sonarChannel) :
 }
 
 void LiftSubsystem::raise(double speed) {
-    this->winch.Set(speed);
+    this->winch.Set(-speed);
 }
 
+// do not use
 void LiftSubsystem::lower(double speed) {
-    this->winch.Set(-speed);
+    this->winch.Set(speed);
 }
 
 void LiftSubsystem::stop() {

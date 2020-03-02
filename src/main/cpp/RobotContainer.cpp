@@ -26,11 +26,11 @@
 #include <cmath>
 
 RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller(0), 
-    armSubsystem(0,1,2), 
-    bucketSubsystem(std::pair<int,int>(0,1), std::pair<int,int>(2,3), 5),
-    driveSubsystem(2,5,3,6), 
-    liftSubsystem(0, 6), 
-    loadSubsystem(7,8, std::pair<int,int>(4,5)) {
+    armSubsystem(4), 
+    bucketSubsystem(std::pair<int,int>(2,3), std::pair<int,int>(4,5), 2),
+    driveSubsystem(3,6,2,5), 
+    liftSubsystem(8,0), 
+    loadSubsystem(1,7, std::pair<int,int>(6,7)) {
   // Initialize all of your commands and subsystems here
 
   // Configure the button bindings
@@ -61,7 +61,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // LB + Right-Y -> move arms manually
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) && 
    frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand) > 0.1);}))
-  .WhileActiveContinous([this] {this->armSubsystem.raise(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand));},
+  .WhileActiveContinous([this] {this->armSubsystem.raise(-this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand));},
                         {&(this->armSubsystem)});
   
   // RB + Y -> raise winch manually
@@ -70,12 +70,13 @@ void RobotContainer::ConfigureButtonBindings() {
   .WhileActiveContinous([this] {this->liftSubsystem.raise(1.0);},
                         {&(this->liftSubsystem)});
 
-  // RB + X -> lower winch manually - may not actually use
+  // RB + X -> lower winch manually - DO NOT USE
+#ifdef LOWER_WINCH
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kX)))
   .WhileActiveContinous([this] {this->liftSubsystem.lower(1.0);},
                         {&(this->liftSubsystem)});
-
+#endif
   // Start + Select -> Run winch program, lift automatically
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBack)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStart)))

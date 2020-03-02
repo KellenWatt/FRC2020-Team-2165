@@ -15,17 +15,13 @@ private:
 
     // May not be necessary, as switches might be directly wired to Talon. 
     // Keeping because it literally can't hurt, as long as they're `false` by default
-    frc::DigitalInput armsUp;
-    frc::DigitalInput armsDown;
 /*
     frc::Servo hookReleaseLeft;
     frc::Servo hookReleaseRight;
 */
 public:
 
-    ArmSubsystem();
-    ArmSubsystem(int motor, int up, int down);
-    ArmSubsystem(int motor, int up, int down, int hookLeft, int hookRight);
+    ArmSubsystem(int motor);
 
     void raise(double speed);
     void lower(double speed);
@@ -33,9 +29,6 @@ public:
 
 //    void releaseHook(bool release);
 
-    bool fullRaised();
-    bool fullLowered();
-    bool middling();
 };
 
 #endif
