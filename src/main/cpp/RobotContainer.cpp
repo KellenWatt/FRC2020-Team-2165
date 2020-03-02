@@ -34,53 +34,69 @@ RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller
   // Initialize all of your commands and subsystems here
 
   // Configure the button bindings
-  this->endgameEnabled = false;
-
   ConfigureButtonBindings();
 
-  // Drives straight with right stick
-  // turns at a constant rate with the bumpers: CW with right, CCW with left.
-  // Also, does a little bit of black magic.
   driveSubsystem.SetDefaultCommand(frc2::RunCommand([this] {
-    this->driveSubsystem.arcadeDrive(this->controller.GetY(frc::GenericHID::kRightHand),
-                                     (this->controller.GetBumperPressed(frc::GenericHID::JoystickHand::kLeftHand) ? -1 : 
-                                        (this->controller.GetBumperPressed(frc::GenericHID::JoystickHand::kRightHand) ? 1 : 0)) * 0.8);
+    this->driveSubsystem.arcadeDrive(this->controller.GetY(frc::GenericHID::kLeftHand),
+                                 this->controller.GetX(frc::GenericHID::kRightHand));
   }, {&(this->driveSubsystem)}));
-
-  armSubsystem.SetDefaultCommand(frc2::RunCommand([this] {
-    if(this->endgameEnabled) {
-      this->armSubsystem.raise(this->controller.GetY(frc::GenericHID::kLeftHand));
-    }
-  }, {&(this->armSubsystem)}));
 
 }
 
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
-  // toggles endgame state
-  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBack))
-  .ToggleWhenPressed(frc2::StartEndCommand([this] {this->endgameEnabled = true;},                         
-                                           [this] {this->endgameEnabled = false;}));
+  // LB + Y -> raise arms manually
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) &&
+   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kY)))
+  .WhileActiveContinous([this] {this->armSubsystem.raise(1.0);},
+                        {&(this->armSubsystem)});
+  
+  // LB + X -> lower arms manually
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) &&
+   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kX)))
+  .WhileActiveContinous([this] {this->armSubsystem.lower(1.0);},
+                        {&(this->armSubsystem)});
+  
+  // LB + Right-Y -> move arms manually
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) && 
+   frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand) > 0.1);}))
+  .WhileActiveContinous([this] {this->armSubsystem.raise(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand));},
+                        {&(this->armSubsystem)});
+  
+  // RB + Y -> raise winch manually
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
+   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kY)))
+  .WhileActiveContinous([this] {this->liftSubsystem.raise(1.0);},
+                        {&(this->liftSubsystem)});
 
-  // Enables winch on DPAD-Up and toggled state
-  frc2::Trigger([this] {return this->controller.GetPOV() == 0 && this->endgameEnabled;})
+  // RB + X -> lower winch manually - may not actually use
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
+   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kX)))
+  .WhileActiveContinous([this] {this->liftSubsystem.lower(1.0);},
+                        {&(this->liftSubsystem)});
+
+  // Start + Select -> Run winch program, lift automatically
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBack)) &&
+   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStart)))
   .ToggleWhenActive(frc2::RunCommand([this] {this->liftSubsystem.raise(1.0 * (this->liftSubsystem.getHeight() < 1.0));}, 
                                {&(this->liftSubsystem)}));
 
-  // Enables loader on RT press, disables on LT press
-  frc2::Trigger([this] {return abs(this->controller.GetTriggerAxis(frc::GenericHID::JoystickHand::kRightHand)) > 0.2;})
-  .WhenActive(frc2::RunCommand([this] {this->loadSubsystem.fullEnable(true);}, {&(this->loadSubsystem)})
-              .WithInterrupt([this] {return abs(this->controller.GetTriggerAxis(frc::GenericHID::JoystickHand::kLeftHand)) > 0.2;})
-              .AndThen([this] {this->loadSubsystem.fullEnable(false);}));
+  // Toggle A -> full enable/disable loader
+  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kA))
+  .ToggleWhenPressed(frc2::RunCommand([this] {this->loadSubsystem.fullEnable(true);
+                                      }, {&(this->loadSubsystem)})
+                     .AndThen([this] {this->loadSubsystem.fullEnable(false);}));
 
   // Hold B -> Raise/Lower bucket
   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kB))
   .WhenActive([this] {this->bucketSubsystem.raiseBucket(true);}, {&(this->bucketSubsystem)})
   .WhenInactive([this] {this->bucketSubsystem.raiseBucket(false);}, {&(this->bucketSubsystem)});
 
-  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight))
-  .WhenActive([this] {this->driveSubsystem.arcadeDrive(0, 0.8);}, {&(this->driveSubsystem)});
+  // Left stick -> activate/deactivate popper manually
+  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStickLeft))
+  .WhenActive([this] {this->bucketSubsystem.popArm(true);}, {&(this->bucketSubsystem)})
+  .WhenInactive([this] {this->bucketSubsystem.popArm(false);}, {&(this->bucketSubsystem)});
 
   // Photo sensor -> activate/deactivate popper automatically
   frc2::Trigger([this] {return this->bucketSubsystem.hasBall();})
@@ -90,8 +106,8 @@ void RobotContainer::ConfigureButtonBindings() {
                 frc2::WaitCommand(0.2_s)
   ).AndThen([this] {this->bucketSubsystem.popArm(false);}));
 
-  // press A -> 180 spin
-  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kA))
+  // Right stick -> 180 spin
+  frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStickRight))
   .WhenActive(frc2::SequentialCommandGroup(
                 frc2::InstantCommand([this] {this->driveSubsystem.resetGyro();}),
                 frc2::RunCommand([this] {this->driveSubsystem.turnToAngle(180);})
