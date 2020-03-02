@@ -70,7 +70,7 @@ void RobotContainer::ConfigureButtonBindings() {
   .WhileActiveContinous([this] {this->liftSubsystem.raise(1.0);},
                         {&(this->liftSubsystem)});
 
-  // RB + X -> lower winch manually
+  // RB + X -> lower winch manually - may not actually use
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kX)))
   .WhileActiveContinous([this] {this->liftSubsystem.lower(1.0);},
@@ -102,7 +102,8 @@ void RobotContainer::ConfigureButtonBindings() {
   frc2::Trigger([this] {return this->bucketSubsystem.hasBall();})
   .WhenActive(frc2::SequentialCommandGroup(
                 frc2::WaitCommand(1.0_s),
-                frc2::InstantCommand([this] {this->bucketSubsystem.popArm(true);}, {&(this->bucketSubsystem)})
+                frc2::InstantCommand([this] {this->bucketSubsystem.popArm(true);}, {&(this->bucketSubsystem)}),
+                frc2::WaitCommand(0.2_s)
   ).AndThen([this] {this->bucketSubsystem.popArm(false);}));
 
   // Right stick -> 180 spin
