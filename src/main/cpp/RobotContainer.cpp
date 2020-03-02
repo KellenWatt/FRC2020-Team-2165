@@ -43,8 +43,8 @@ RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller
   // Also, does a little bit of black magic.
   driveSubsystem.SetDefaultCommand(frc2::RunCommand([this] {
     this->driveSubsystem.arcadeDrive(this->controller.GetY(frc::GenericHID::kRightHand),
-                                     (this->controller.GetBumperPressed(frc::GenericHID::JoystickHand::kLeftHand) ? -1 : 
-                                        (this->controller.GetBumperPressed(frc::GenericHID::JoystickHand::kRightHand) ? 1 : 0)) * 0.8);
+                                     (this->controller.GetBumper(frc::GenericHID::JoystickHand::kLeftHand) ? -1 : 
+                                        (this->controller.GetBumper(frc::GenericHID::JoystickHand::kRightHand) ? 1 : 0)) * 0.8);
   }, {&(this->driveSubsystem)}));
 
   armSubsystem.SetDefaultCommand(frc2::RunCommand([this] {
