@@ -80,14 +80,18 @@ void RobotContainer::ConfigureButtonBindings() {
   // Start + Select -> Run winch program, lift automatically
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBack)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStart)))
-  .ToggleWhenActive(frc2::RunCommand([this] {this->liftSubsystem.raise(1.0 * (this->liftSubsystem.getHeight() < 1.0));}, 
+  .ToggleWhenActive(frc2::RunCommand([this] {this->liftSubsystem.raise(0.5 * (this->liftSubsystem.getHeight() < 1.0));}, 
                                {&(this->liftSubsystem)}));
 
-  // Toggle A -> full enable/disable loader
   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kA))
-  .ToggleWhenPressed(frc2::RunCommand([this] {this->loadSubsystem.fullEnable(true);
-                                      }, {&(this->loadSubsystem)})
+  .ToggleWhenPressed(frc2::SequentialCommandGroup(
+                        frc2::InstantCommand([this] {this->loadSubsystem.lowerCaptureArm(true);}),
+                        frc2::WaitCommand(0.5_s),
+                        frc2::RunCommand([this] {this->loadSubsystem.enableBelt(true);
+                                                 this->loadSubsystem.enableCaptureRoller(true);}))
                      .AndThen([this] {this->loadSubsystem.fullEnable(false);}));
+
+
 
   // Hold B -> Raise/Lower bucket
   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kB))
