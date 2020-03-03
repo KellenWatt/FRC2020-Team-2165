@@ -1,8 +1,8 @@
 #include "subsystems/ArmSubsystem.h"
 
-ArmSubsystem::ArmSubsystem() : ArmSubsystem::ArmSubsystem(0,0,0) {}
+//ArmSubsystem::ArmSubsystem() : ArmSubsystem::ArmSubsystem(0,0,0) {}
 
-ArmSubsystem::ArmSubsystem(int motor, int up, int down) : armMotor(motor), armsUp(up), armsDown(down) {
+ArmSubsystem::ArmSubsystem(int motor) : armMotor(motor) {
     // Configures the pins on the Talons
     this->armMotor.ConfigForwardLimitSwitchSource(LimitSwitchSource::LimitSwitchSource_FeedbackConnector, LimitSwitchNormal::LimitSwitchNormal_NormallyOpen, 0);
     this->armMotor.ConfigReverseLimitSwitchSource(LimitSwitchSource::LimitSwitchSource_FeedbackConnector, LimitSwitchNormal::LimitSwitchNormal_NormallyOpen, 0);
@@ -15,11 +15,11 @@ ArmSubsystem::ArmSubsystem(int motor, int up, int down, int hookLeft, int hookRi
 }*/
 
 void ArmSubsystem::raise(double speed) {
-    this->armMotor.Set(speed * !this->fullRaised());
+    this->armMotor.Set(speed);
 }
 
 void ArmSubsystem::lower(double speed) {
-    this->armMotor.Set(-speed * !this->fullLowered());
+    this->armMotor.Set(-speed);
 }
 
 void ArmSubsystem::fullStop() {
@@ -33,7 +33,7 @@ void ArmSubsystem::releaseHook(bool release) {
     this->hookReleaseLeft.Set(base + (range*release));
     this->hookReleaseRight.Set((1.0 - base) - (range*release));
 }
-*/
+
 bool ArmSubsystem::fullRaised() {
     return this->armsUp.Get();
 }
@@ -45,4 +45,5 @@ bool ArmSubsystem::fullLowered() {
 bool ArmSubsystem::middling() {
     return !(this->fullRaised() || this->fullLowered());
 }
+*/
 
