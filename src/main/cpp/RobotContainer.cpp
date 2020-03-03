@@ -108,7 +108,7 @@ void RobotContainer::ConfigureButtonBindings() {
   .WhenActive(frc2::SequentialCommandGroup(
                 frc2::WaitCommand(1.0_s),
                 frc2::InstantCommand([this] {this->bucketSubsystem.popArm(true);}, {&(this->bucketSubsystem)}),
-                frc2::WaitCommand(0.2_s)
+                frc2::WaitCommand(0.5_s)
   ).AndThen([this] {this->bucketSubsystem.popArm(false);}));
 
   // Right stick -> 180 spin
