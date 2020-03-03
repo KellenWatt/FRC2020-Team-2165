@@ -67,14 +67,14 @@ void RobotContainer::ConfigureButtonBindings() {
   // RB + Y -> raise winch manually
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kY)))
-  .WhileActiveContinous([this] {this->liftSubsystem.raise(1.0);},
+  .WhileActiveContinous([this] {this->liftSubsystem.raise(0.5);},
                         {&(this->liftSubsystem)});
 
   // RB + X -> lower winch manually - DO NOT USE
 #ifdef LOWER_WINCH
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kX)))
-  .WhileActiveContinous([this] {this->liftSubsystem.lower(1.0);},
+  .WhileActiveContinous([this] {this->liftSubsystem.lower(0.5);},
                         {&(this->liftSubsystem)});
 #endif
   // Start + Select -> Run winch program, lift automatically
