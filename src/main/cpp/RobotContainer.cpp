@@ -58,7 +58,7 @@ void RobotContainer::ConfigureButtonBindings() {
   .WhileActiveContinous([this] {this->armSubsystem.lower(1.0);},
                         {&(this->armSubsystem)});
   
-  // LB + Right-Y -> move arms manually
+  // LB + Right-Y -> move arms manually, variable speed
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) && 
    frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand) > 0.1);}))
   .WhileActiveContinous([this] {this->armSubsystem.raise(-this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand));},
@@ -69,6 +69,12 @@ void RobotContainer::ConfigureButtonBindings() {
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kY)))
   .WhileActiveContinous([this] {this->liftSubsystem.raise(0.5);},
                         {&(this->liftSubsystem)});
+  
+  // RB + Right-Y -> move arms manually, variable speed (only upward)
+  (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
+   frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand) > 0.1);}))
+   .WhileActiveContinous([this] {this->liftSubsystem.raise(abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand)));},
+                         {&(this->liftSubsystem)});
 
   // RB + X -> lower winch manually - DO NOT USE
 #ifdef LOWER_WINCH
