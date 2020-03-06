@@ -127,6 +127,22 @@ void RobotContainer::ConfigureButtonBindings() {
                 frc2::RunCommand([this] {this->driveSubsystem.turnToAngleAtSpeed(180, 0.6);}, {&(this->driveSubsystem)}))
   .WithInterrupt([this] {return this->driveSubsystem.atAngle(180);}), {&(this->driveSubsystem)});
 
+
+  // Granular Controls for loader
+  // Run belt
+  frc2::Trigger([this] {return this->controller.GetPOV() == 0 || this->controller.GetPOV() == 45;})
+  .WhenActive([this] {this->loadSubsystem.enableBelt(true);}, {&(this->loadSubsystem)})
+  .WhenInactive([this] {this->loadSubsystem.enableBelt(false);}, {&(this->loadSubsystem)});
+
+  frc2::Trigger([this] {return this->controller.GetPOV() == 90 || this->controller.GetPOV() == 45;})
+  .WhenActive([this] {this->loadSubsystem.enableCaptureRoller(true);}, {&(this->loadSubsystem)})
+  .WhenInactive([this] {this->loadSubsystem.enableCaptureRoller(false);}, {&(this->loadSubsystem)});
+
+  frc2::Trigger([this] {return this->controller.GetPOV() == 180;})
+  .ToggleWhenActive(frc2::StartEndCommand([this] {this->loadSubsystem.lowerCaptureArm(true);},
+                                          [this] {this->loadSubsystem.lowerCaptureArm(false);},
+                                          {&(this->loadSubsystem)}));
+
 }
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
