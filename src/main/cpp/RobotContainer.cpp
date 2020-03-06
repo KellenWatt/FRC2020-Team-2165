@@ -16,6 +16,7 @@
 #include <frc2/command/SequentialCommandGroup.h>
 #include <frc2/command/WaitCommand.h>
 #include <frc2/command/WaitUntilCommand.h>
+#include <frc2/command/FunctionalCommand.h>
 #include <frc/XboxController.h>
 #include <frc2/command/button/JoystickButton.h>
 #include <frc2/command/button/Trigger.h>
@@ -76,7 +77,7 @@ void RobotContainer::ConfigureButtonBindings() {
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
    frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand) > 0.1);}))
   .WhileActiveContinous([this] {this->liftSubsystem.raise(abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand)));},
-                         {&(this->liftSubsystem)})
+                        {&(this->liftSubsystem)})
   .WhenInactive([this] {this->liftSubsystem.stop();}, {&(this->liftSubsystem)});
 
   // RB + X -> lower winch manually - DO NOT USE
@@ -89,8 +90,11 @@ void RobotContainer::ConfigureButtonBindings() {
   // Start + Select -> Run winch program, lift automatically
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBack)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStart)))
-  .ToggleWhenActive(frc2::RunCommand([this] {this->liftSubsystem.raise(0.5 * (this->liftSubsystem.getHeight() < 1.0));}, 
-                               {&(this->liftSubsystem)}));
+  .ToggleWhenActive(frc2::FunctionalCommand([this] {},
+                                            [this] {this->liftSubsystem.raise(0.5 * (this->liftSubsystem.getHeight() < 1.0));},
+                                            [this] (bool) {this->liftSubsystem.stop();},
+                                            [this] {return false;}, 
+                                            {&(this->liftSubsystem)}));
 
   // Toggle A -> enable/disable loader
   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kA))
