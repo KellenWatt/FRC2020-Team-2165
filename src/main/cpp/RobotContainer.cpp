@@ -29,7 +29,7 @@
 RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller(0), 
     armSubsystem(4), 
     bucketSubsystem(std::pair<int,int>(2,3), std::pair<int,int>(4,5), 2),
-    driveSubsystem(3,6,2,5, std::pair<int,int>(0,0)), 
+    driveSubsystem(3,6,2,5, std::pair<int,int>(0,1)), 
     liftSubsystem(8,0), 
     loadSubsystem(1,7, std::pair<int,int>(6,7)) {
   // Initialize all of your commands and subsystems here
@@ -129,15 +129,15 @@ void RobotContainer::ConfigureButtonBindings() {
 
 
   // Granular Controls for loader
-  // Run belt
+  // Run belt on D-pad up or up-right
   frc2::Trigger([this] {return this->controller.GetPOV() == 0 || this->controller.GetPOV() == 45;})
   .WhenActive([this] {this->loadSubsystem.enableBelt(true);}, {&(this->loadSubsystem)})
   .WhenInactive([this] {this->loadSubsystem.enableBelt(false);}, {&(this->loadSubsystem)});
-
+  // Run roller on D-pad right or up-right
   frc2::Trigger([this] {return this->controller.GetPOV() == 90 || this->controller.GetPOV() == 45;})
   .WhenActive([this] {this->loadSubsystem.enableCaptureRoller(true);}, {&(this->loadSubsystem)})
   .WhenInactive([this] {this->loadSubsystem.enableCaptureRoller(false);}, {&(this->loadSubsystem)});
-
+  // toggle capture arm on D-pad down
   frc2::Trigger([this] {return this->controller.GetPOV() == 180;})
   .ToggleWhenActive(frc2::StartEndCommand([this] {this->loadSubsystem.lowerCaptureArm(true);},
                                           [this] {this->loadSubsystem.lowerCaptureArm(false);},

@@ -14,8 +14,8 @@ DriveSubsystem::DriveSubsystem(int rf, int rr, int lf, int lr, std::pair<int,int
         encoder(encoderChannels.first, encoderChannels.second) {
 // set encoder constants
 
-
-
+    this->encoder.SetDistancePerPulse(0.01252); // This is correct. Don't worry about it.
+    this->encoder.SetReverseDirection(true);
 
 }
 
