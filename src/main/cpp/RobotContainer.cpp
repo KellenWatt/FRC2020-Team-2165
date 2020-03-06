@@ -37,8 +37,8 @@ RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller
   ConfigureButtonBindings();
 
   driveSubsystem.SetDefaultCommand(frc2::RunCommand([this] {
-    this->driveSubsystem.arcadeDrive(-this->controller.GetY(frc::GenericHID::kLeftHand),
-                                 this->controller.GetX(frc::GenericHID::kRightHand));
+    this->driveSubsystem.arcadeDrive(-this->controller.GetY(frc::GenericHID::JoystickHand::kLeftHand),
+                                     this->controller.GetX(frc::GenericHID::JoystickHand::kRightHand));
   }, {&(this->driveSubsystem)}));
 
 }
@@ -49,16 +49,14 @@ void RobotContainer::ConfigureButtonBindings() {
   // LB + Y -> raise arms manually
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kY)))
-  .WhileActiveContinous([this] {this->armSubsystem.raise(1.0);},
-                        {&(this->armSubsystem)})
+  .WhileActiveContinous([this] {this->armSubsystem.raise(1.0);}, {&(this->armSubsystem)})
   .WhenInactive([this] {this->armSubsystem.fullStop();}, {&(this->armSubsystem)});
 
   
   // LB + X -> lower arms manually
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kX)))
-  .WhileActiveContinous([this] {this->armSubsystem.lower(1.0);},
-                        {&(this->armSubsystem)})
+  .WhileActiveContinous([this] {this->armSubsystem.lower(1.0);}, {&(this->armSubsystem)})
   .WhenInactive([this] {this->armSubsystem.fullStop();}, {&(this->armSubsystem)});
   
   // LB + Right-Y -> move arms manually, variable speed
@@ -71,8 +69,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // RB + Y -> raise winch manually
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kY)))
-  .WhileActiveContinous([this] {this->liftSubsystem.raise(0.5);},
-                        {&(this->liftSubsystem)})
+  .WhileActiveContinous([this] {this->liftSubsystem.raise(0.5);}, {&(this->liftSubsystem)})
   .WhenInactive([this] {this->liftSubsystem.stop();}, {&(this->liftSubsystem)});
   
   // RB + Right-Y -> move arms manually, variable speed (only upward)
@@ -123,8 +120,8 @@ void RobotContainer::ConfigureButtonBindings() {
   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStickRight))
   .WhenActive(frc2::SequentialCommandGroup(
                 frc2::InstantCommand([this] {this->driveSubsystem.resetGyro();}, {&(this->driveSubsystem)}),
-                frc2::RunCommand([this] {this->driveSubsystem.turnToAngleAtSpeed(180, 0.6);}, {&(this->driveSubsystem)})
-  ).WithInterrupt([this] {return this->driveSubsystem.atAngle(180);}), {&(this->driveSubsystem)});
+                frc2::RunCommand([this] {this->driveSubsystem.turnToAngleAtSpeed(180, 0.6);}, {&(this->driveSubsystem)}))
+  .WithInterrupt([this] {return this->driveSubsystem.atAngle(180);}), {&(this->driveSubsystem)});
 
 }
 
