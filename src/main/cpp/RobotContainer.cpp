@@ -62,7 +62,7 @@ void RobotContainer::ConfigureButtonBindings() {
   
   // LB + Right-Y -> move arms manually, variable speed
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) && 
-   frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand) > 0.1);}))
+   frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand)) > 0.1;}))
   .WhileActiveContinous([this] {this->armSubsystem.raise(-this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand));},
                         {&(this->armSubsystem)})
   .WhenInactive([this] {this->armSubsystem.fullStop();}, {&(this->armSubsystem)});
@@ -75,7 +75,7 @@ void RobotContainer::ConfigureButtonBindings() {
   
   // RB + Right-Y -> move arms manually, variable speed (only upward)
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
-   frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand) > 0.1);}))
+   frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand))> 0.1;}))
   .WhileActiveContinous([this] {this->liftSubsystem.raise(abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand)));},
                         {&(this->liftSubsystem)})
   .WhenInactive([this] {this->liftSubsystem.stop();}, {&(this->liftSubsystem)});
@@ -98,9 +98,9 @@ void RobotContainer::ConfigureButtonBindings() {
 
   // Toggle A -> enable/disable loader
   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kA))
-  .ToggleWhenPressed(frc2::StartEndCommand([this] {this->loadSubsystem.fullEnable(true);},
-                                           [this] {this->loadSubsystem.fullEnable(false);},
-                                           {&(this->loadSubsystem)}));
+  .ToggleWhenActive(frc2::StartEndCommand([this] {this->loadSubsystem.fullEnable(true);},
+                                          [this] {this->loadSubsystem.fullEnable(false);},
+                                          {&(this->loadSubsystem)}));
     
   // Hold B -> Raise/Lower bucket
   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kB))
