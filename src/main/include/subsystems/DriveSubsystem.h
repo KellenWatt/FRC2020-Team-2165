@@ -7,7 +7,7 @@
 #include <ctre/Phoenix.h>
 #include <frc/SpeedControllerGroup.h>
 #include <frc/drive/DifferentialDrive.h>
-#include <frc/Ultrasonic.h>
+#include <frc/Encoder.h>
 
 #include <AHRS.h>
 
@@ -25,20 +25,24 @@ private:
     frc::DifferentialDrive drivetrain;
 
     AHRS gyro;
+    frc::Encoder encoder;
 
 public: 
-    DriveSubsystem();
-    DriveSubsystem(int rf, int rr, int lf, int lr);
+    DriveSubsystem(int rf, int rr, int lf, int lr, std::pair<int,int> encoderChannels);
 
     void arcadeDrive(double speed, double rotation);
+    void adjustedArcadeDrive(double speed, double rotation);
     void turnToAngle(double angle);
     void turnToAngleAtSpeed(double angle, double speed);
 
     double getAngle();
     bool atAngle(double angle);
 
+    double getDistance();
+
     void setMaxSpeed(double max);
     void resetGyro();
+    void resetEncoder();
 };
 
 

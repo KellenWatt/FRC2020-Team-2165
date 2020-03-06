@@ -29,7 +29,7 @@
 RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller(0), 
     armSubsystem(4), 
     bucketSubsystem(std::pair<int,int>(2,3), std::pair<int,int>(4,5), 2),
-    driveSubsystem(3,6,2,5), 
+    driveSubsystem(3,6,2,5, std::pair<int,int>(0,0)), 
     liftSubsystem(8,0), 
     loadSubsystem(1,7, std::pair<int,int>(6,7)) {
   // Initialize all of your commands and subsystems here
@@ -38,8 +38,8 @@ RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller
   ConfigureButtonBindings();
 
   driveSubsystem.SetDefaultCommand(frc2::RunCommand([this] {
-    this->driveSubsystem.arcadeDrive(-this->controller.GetY(frc::GenericHID::JoystickHand::kLeftHand),
-                                     this->controller.GetX(frc::GenericHID::JoystickHand::kRightHand));
+    this->driveSubsystem.adjustedArcadeDrive(-this->controller.GetY(frc::GenericHID::JoystickHand::kLeftHand),
+                                             this->controller.GetX(frc::GenericHID::JoystickHand::kRightHand));
   }, {&(this->driveSubsystem)}));
 
 }
@@ -75,7 +75,7 @@ void RobotContainer::ConfigureButtonBindings() {
   
   // RB + Right-Y -> move arms manually, variable speed (only upward)
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
-   frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand))> 0.1;}))
+   frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand)) > 0.1;}))
   .WhileActiveContinous([this] {this->liftSubsystem.raise(abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand)));},
                         {&(this->liftSubsystem)})
   .WhenInactive([this] {this->liftSubsystem.stop();}, {&(this->liftSubsystem)});
