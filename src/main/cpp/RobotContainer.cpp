@@ -37,7 +37,7 @@ RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller
   ConfigureButtonBindings();
 
   driveSubsystem.SetDefaultCommand(frc2::RunCommand([this] {
-    this->driveSubsystem.arcadeDrive(this->controller.GetY(frc::GenericHID::kLeftHand),
+    this->driveSubsystem.arcadeDrive(-this->controller.GetY(frc::GenericHID::kLeftHand),
                                  this->controller.GetX(frc::GenericHID::kRightHand));
   }, {&(this->driveSubsystem)}));
 
@@ -50,31 +50,37 @@ void RobotContainer::ConfigureButtonBindings() {
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kY)))
   .WhileActiveContinous([this] {this->armSubsystem.raise(1.0);},
-                        {&(this->armSubsystem)});
+                        {&(this->armSubsystem)})
+  .WhenInactive([this] {this->armSubsystem.fullStop();}, {&(this->armSubsystem)});
+
   
   // LB + X -> lower arms manually
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kX)))
   .WhileActiveContinous([this] {this->armSubsystem.lower(1.0);},
-                        {&(this->armSubsystem)});
+                        {&(this->armSubsystem)})
+  .WhenInactive([this] {this->armSubsystem.fullStop();}, {&(this->armSubsystem)});
   
   // LB + Right-Y -> move arms manually, variable speed
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperLeft)) && 
    frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand) > 0.1);}))
   .WhileActiveContinous([this] {this->armSubsystem.raise(-this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand));},
-                        {&(this->armSubsystem)});
+                        {&(this->armSubsystem)})
+  .WhenInactive([this] {this->armSubsystem.fullStop();}, {&(this->armSubsystem)});
   
   // RB + Y -> raise winch manually
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kY)))
   .WhileActiveContinous([this] {this->liftSubsystem.raise(0.5);},
-                        {&(this->liftSubsystem)});
+                        {&(this->liftSubsystem)})
+  .WhenInactive([this] {this->liftSubsystem.stop();}, {&(this->liftSubsystem)});
   
   // RB + Right-Y -> move arms manually, variable speed (only upward)
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBumperRight)) &&
    frc2::Trigger([this] {return abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand) > 0.1);}))
-   .WhileActiveContinous([this] {this->liftSubsystem.raise(abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand)));},
-                         {&(this->liftSubsystem)});
+  .WhileActiveContinous([this] {this->liftSubsystem.raise(abs(this->controller.GetY(frc::GenericHID::JoystickHand::kRightHand)));},
+                         {&(this->liftSubsystem)})
+  .WhenInactive([this] {this->liftSubsystem.stop();}, {&(this->liftSubsystem)});
 
   // RB + X -> lower winch manually - DO NOT USE
 #ifdef LOWER_WINCH
@@ -89,16 +95,12 @@ void RobotContainer::ConfigureButtonBindings() {
   .ToggleWhenActive(frc2::RunCommand([this] {this->liftSubsystem.raise(0.5 * (this->liftSubsystem.getHeight() < 1.0));}, 
                                {&(this->liftSubsystem)}));
 
+  // Toggle A -> enable/disable loader
   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kA))
-  .ToggleWhenPressed(frc2::SequentialCommandGroup(
-                        frc2::InstantCommand([this] {this->loadSubsystem.lowerCaptureArm(true);}),
-                        frc2::WaitCommand(0.5_s),
-                        frc2::RunCommand([this] {this->loadSubsystem.enableBelt(true);
-                                                 this->loadSubsystem.enableCaptureRoller(true);}))
-                     .AndThen([this] {this->loadSubsystem.fullEnable(false);}));
-
-
-
+  .ToggleWhenPressed(frc2::StartEndCommand([this] {this->loadSubsystem.fullEnable(true);},
+                                           [this] {this->loadSubsystem.fullEnable(false);},
+                                           {&(this->loadSubsystem)}));
+    
   // Hold B -> Raise/Lower bucket
   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kB))
   .WhenActive([this] {this->bucketSubsystem.raiseBucket(true);}, {&(this->bucketSubsystem)})
@@ -112,16 +114,16 @@ void RobotContainer::ConfigureButtonBindings() {
   // Photo sensor -> activate/deactivate popper automatically
   frc2::Trigger([this] {return this->bucketSubsystem.hasBall();})
   .WhenActive(frc2::SequentialCommandGroup(
-                frc2::WaitCommand(1.0_s),
+                frc2::WaitCommand(0.8_s),
                 frc2::InstantCommand([this] {this->bucketSubsystem.popArm(true);}, {&(this->bucketSubsystem)}),
-                frc2::WaitCommand(0.5_s)
-  ).AndThen([this] {this->bucketSubsystem.popArm(false);}));
+                frc2::WaitCommand(0.5_s),
+                frc2::InstantCommand([this] {this->bucketSubsystem.popArm(false);}, {&(this->bucketSubsystem)})));
 
   // Right stick -> 180 spin
   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStickRight))
   .WhenActive(frc2::SequentialCommandGroup(
-                frc2::InstantCommand([this] {this->driveSubsystem.resetGyro();}),
-                frc2::RunCommand([this] {this->driveSubsystem.turnToAngle(180);})
+                frc2::InstantCommand([this] {this->driveSubsystem.resetGyro();}, {&(this->driveSubsystem)}),
+                frc2::RunCommand([this] {this->driveSubsystem.turnToAngleAtSpeed(180, 0.6);}, {&(this->driveSubsystem)})
   ).WithInterrupt([this] {return this->driveSubsystem.atAngle(180);}), {&(this->driveSubsystem)});
 
 }

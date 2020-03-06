@@ -8,7 +8,7 @@ LoadSubsystem::LoadSubsystem(int beltChannel, int captureRollerChannel, std::pai
         loaderBelt(beltChannel), captureRoller(captureRollerChannel), 
         captureArm(captureArmChannels.first, captureArmChannels.second) {
     this->beltSpeed = 1.0;
-    this->captureRollerSpeed = 1.0;
+    this->captureRollerSpeed = -1.0;
 }
 
 void LoadSubsystem::lowerCaptureArm(bool lowered) {
@@ -34,7 +34,7 @@ void LoadSubsystem::setBeltSpeed(double speed) {
 }
 
 void LoadSubsystem::setCaptureRollerSpeed(double speed) {
-    this->captureRollerSpeed = speed;
+    this->captureRollerSpeed = -speed;
 }
 
 bool LoadSubsystem::armLowered(){
