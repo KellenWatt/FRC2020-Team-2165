@@ -139,19 +139,19 @@ void RobotContainer::ConfigureButtonBindings() {
 
 
   // Granular Controls for loader
+  // Requirement restrictions removed, so be careful
   // Run belt on D-pad up or up-right
   frc2::Trigger([this] {return this->controller.GetPOV() == 0 || this->controller.GetPOV() == 45;})
-  .WhenActive([this] {this->loadSubsystem.enableBelt(true);}, {&(this->loadSubsystem)})
-  .WhenInactive([this] {this->loadSubsystem.enableBelt(false);}, {&(this->loadSubsystem)});
+  .WhenActive([this] {this->loadSubsystem.enableBelt(true);})
+  .WhenInactive([this] {this->loadSubsystem.enableBelt(false);});
   // Run roller on D-pad right or up-right
   frc2::Trigger([this] {return this->controller.GetPOV() == 90 || this->controller.GetPOV() == 45;})
-  .WhenActive([this] {this->loadSubsystem.enableCaptureRoller(true);}, {&(this->loadSubsystem)})
-  .WhenInactive([this] {this->loadSubsystem.enableCaptureRoller(false);}, {&(this->loadSubsystem)});
+  .WhenActive([this] {this->loadSubsystem.enableCaptureRoller(true);})
+  .WhenInactive([this] {this->loadSubsystem.enableCaptureRoller(false);});
   // toggle capture arm on D-pad down
   frc2::Trigger([this] {return this->controller.GetPOV() == 180;})
   .ToggleWhenActive(frc2::StartEndCommand([this] {this->loadSubsystem.lowerCaptureArm(true);},
-                                          [this] {this->loadSubsystem.lowerCaptureArm(false);},
-                                          {&(this->loadSubsystem)}));
+                                          [this] {this->loadSubsystem.lowerCaptureArm(false);}));
 
 }
 
