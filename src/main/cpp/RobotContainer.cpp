@@ -92,6 +92,7 @@ void RobotContainer::ConfigureButtonBindings() {
   .WhileActiveContinous([this] {this->liftSubsystem.lower(0.5);},
                         {&(this->liftSubsystem)});
 #endif
+
   // Start + Select -> Run winch program, lift automatically
   (frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kBack)) &&
    frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStart)))
@@ -174,6 +175,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
     std::pair<int, frc2::SequentialCommandGroup>(4, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->loadSubsystem.fullEnable(true);}),
                                               frc2::WaitCommand(0.5_s),
                                               frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
-                                              .WithTimeout(10.0_s)))
+                                              .WithTimeout(14.0_s)
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 132;})))
   );
 }

@@ -16,10 +16,10 @@
     - *release*: Lower hopper
 - Press **Left Stick**: manually enable/disable popper
 - Toggle A: enable/disable retriever
-    - *enables*:
-        - Roller arm
-        - Roller
-        - Retriever belt
+    - *enables the following (individual controls listed after)*:
+        - Retriever arm - toggle **D-pad-down**
+        - Roller - toggle **D-pad-up**
+        - Retriever belt - toggle **D-pad-right**
 - Hold(**LB** + **Y**): raise arms at a constant rate
 - Hold(**LB** + **X**): lower arms at a constant rate
 - Hold(**LB**) + **Right-Y**: move arms at a variable rate, determined by the joytsick
