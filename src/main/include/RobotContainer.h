@@ -36,11 +36,21 @@ private:
     // Drive off line
     std::pair(1, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->driveSubsystem.resetEncoder();}),
                                               frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
-                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 60;}))),
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 36;}))),
     // Drive backward to goal and dump, then drive back
-    std::pair(2, frc2::SequentialCommandGroup()),
+    std::pair(2, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->driveSubsystem.resetEncoder();}),
+                                              frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(-0.5, 0);})
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() <= -100;}),
+                                              frc2::InstantCommand([this] {this->bucketSubsystem.raiseBucket(true);}),
+                                              frc2::WaitCommand(2.0_s),
+                                              frc2::InstantCommand([this] {this->bucketSubsystem.raiseBucket(false);}),
+                                              frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 36;}))),
     // Drive forward and pick up balls
-    std::pair(4, frc2::SequentialCommandGroup())
+    std::pair(4, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->loadSubsystem.fullEnable(true);}),
+                                              frc2::WaitCommand(0.5_s),
+                                              frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
+                                              .WithTimeout(10.0_s)))
   };
 
 
