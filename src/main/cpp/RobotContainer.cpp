@@ -176,14 +176,16 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
     std::pair<int, frc2::SequentialCommandGroup>(1, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->driveSubsystem.resetEncoder();}),
                                               frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
                                               .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 100;})
-                                              .WithTimeout(10.0_s))),
+                                              .WithTimeout(10.0_s)
+                                              .AndThen([this] {this->driveSubsystem.adjustedArcadeDrive(0,0);}))),
     // Drive forward and pick up balls
     std::pair<int, frc2::SequentialCommandGroup>(2, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->loadSubsystem.fullEnable(true);}),
                                               frc2::WaitCommand(0.5_s),
                                               frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
                                               .WithTimeout(14.0_s)
                                               .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 180;}))
-                                              .AndThen([this] {this->loadSubsystem.fullEnable(false);})),
+                                              .AndThen([this] {this->loadSubsystem.fullEnable(false);
+                                                               this->driveSubsystem.adjustedArcadeDrive(0,0);})),
     // Drive backward to goal and dump, then drive back
     std::pair<int, frc2::SequentialCommandGroup>(3, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->driveSubsystem.resetEncoder();}),
                                               frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(-0.5, 0);})
@@ -193,6 +195,7 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
                                               frc2::WaitCommand(2.0_s),
                                               frc2::InstantCommand([this] {this->bucketSubsystem.raiseBucket(false);}),
                                               frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
-                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 36;})))
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 36;})
+                                              .AndThen([this] {this->driveSubsystem.adjustedArcadeDrive(0,0);})))
   );
 }
