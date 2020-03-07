@@ -10,10 +10,8 @@
 #include <cmath>
 
 #include <frc2/command/Command.h>
+#include <frc2/command/SelectCommand.h>
 #include <frc/XboxController.h>
-
-#include "commands/ExampleCommand.h"
-#include "subsystems/ExampleSubsystem.h"
 
 #include "subsystems/ArmSubsystem.h"
 #include "subsystems/BucketSubsystem.h"
@@ -29,17 +27,22 @@
  * commands, and button mappings) should be declared here.
  */
 class RobotContainer {
- public:
-  RobotContainer();
-
-  frc2::Command* GetAutonomousCommand();
-
- private:
-
-
+private:
   // The robot's subsystems and commands are defined here...
-  ExampleSubsystem m_subsystem;
-  ExampleCommand m_autonomousCommand;
+  frc2::SelectCommand<int> m_autonomousCommand{
+    [this] {return 0;},
+    // Do nothing
+    std::pair(0, frc2::InstantCommand()),
+    // Drive off line
+    std::pair(1, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->driveSubsystem.resetEncoder();}),
+                                              frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 60;}))),
+    // Drive backward to goal and dump, then drive back
+    std::pair(2, frc2::SequentialCommandGroup()),
+    // Drive forward and pick up balls
+    std::pair(4, frc2::SequentialCommandGroup())
+  };
+
 
   frc::XboxController controller;
 
@@ -50,4 +53,9 @@ class RobotContainer {
   LoadSubsystem loadSubsystem;
 
   void ConfigureButtonBindings();
+
+public:
+  RobotContainer();
+
+  frc2::Command* GetAutonomousCommand();
 };

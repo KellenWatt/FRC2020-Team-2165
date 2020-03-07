@@ -14,6 +14,7 @@
 #include <frc2/command/RunCommand.h>
 #include <frc2/command/StartEndCommand.h>
 #include <frc2/command/SequentialCommandGroup.h>
+#include <frc2/command/SelectCommand.h>
 #include <frc2/command/WaitCommand.h>
 #include <frc2/command/WaitUntilCommand.h>
 #include <frc2/command/FunctionalCommand.h>
@@ -26,7 +27,7 @@
 #include <utility>
 #include <cmath>
 
-RobotContainer::RobotContainer() : m_autonomousCommand(&m_subsystem), controller(0), 
+RobotContainer::RobotContainer() : controller(0), 
     armSubsystem(4), 
     bucketSubsystem(std::pair<int,int>(2,3), std::pair<int,int>(4,5), 2),
     driveSubsystem(3,6,2,5, std::pair<int,int>(0,1)), 
@@ -147,5 +148,6 @@ void RobotContainer::ConfigureButtonBindings() {
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // An example command will be run in autonomous
+
   return &m_autonomousCommand;
 }
