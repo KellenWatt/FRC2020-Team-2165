@@ -22,6 +22,8 @@
 #include <frc2/command/button/JoystickButton.h>
 #include <frc2/command/button/Trigger.h>
 
+#include <frc/smartDashboard/SmartDashboard.h>
+
 
 #include <units/units.h>
 #include <utility>
@@ -153,6 +155,16 @@ void RobotContainer::ConfigureButtonBindings() {
 
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // An example command will be run in autonomous
+  
+
+  //button name: DB/Button 0
+  //                       1/2/3
+  //
+  // commands 0: move forward 100 inches at half speed with timout of 10s 
+  //          1: move forward at half speed for 3 seconds
+  //          2: get balls
+  //          3: dump balls
+  //    default: do nothing
 
   return new frc2::SelectCommand<int>(
     [this] {return 0;},
@@ -161,21 +173,24 @@ frc2::Command* RobotContainer::GetAutonomousCommand() {
     // Drive off line
     std::pair<int, frc2::SequentialCommandGroup>(1, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->driveSubsystem.resetEncoder();}),
                                               frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
-                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 36;}))),
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 100;})
+                                              .WithTimeout(10.0_s))),
+    // Drive forward and pick up balls
+    std::pair<int, frc2::SequentialCommandGroup>(2, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->loadSubsystem.fullEnable(true);}),
+                                              frc2::WaitCommand(0.5_s),
+                                              frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
+                                              .WithTimeout(14.0_s)
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 180;}))
+                                              .AndThen([this] {this->loadSubsystem.fullEnable(false);})),
     // Drive backward to goal and dump, then drive back
-    std::pair<int, frc2::SequentialCommandGroup>(2, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->driveSubsystem.resetEncoder();}),
+    std::pair<int, frc2::SequentialCommandGroup>(3, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->driveSubsystem.resetEncoder();}),
                                               frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(-0.5, 0);})
-                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() <= -100;}),
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() <= -84;}),
+                                              frc2::WaitCommand(1.0_s),
                                               frc2::InstantCommand([this] {this->bucketSubsystem.raiseBucket(true);}),
                                               frc2::WaitCommand(2.0_s),
                                               frc2::InstantCommand([this] {this->bucketSubsystem.raiseBucket(false);}),
                                               frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
-                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 36;}))),
-    // Drive forward and pick up balls
-    std::pair<int, frc2::SequentialCommandGroup>(4, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->loadSubsystem.fullEnable(true);}),
-                                              frc2::WaitCommand(0.5_s),
-                                              frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
-                                              .WithTimeout(14.0_s)
-                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 132;})))
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 36;})))
   );
 }
