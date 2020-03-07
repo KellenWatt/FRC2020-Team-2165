@@ -21,6 +21,7 @@
         - Retriever arm - Toggle(**D-pad-down**)
         - Roller - Hold(**D-pad-up**)
         - Retriever belt - Hold(**D-pad-right**)
+        - *Note*: These function independently of the retriever toggle, and the controls are a bit soft
 - Hold(**LB** + **Y**): raise arms at a constant rate
 - Hold(**LB** + **X**): lower arms at a constant rate
 - Hold(**LB**) + **Right-Y**: move arms at a variable rate, determined by the joytsick
