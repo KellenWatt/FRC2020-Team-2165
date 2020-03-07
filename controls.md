@@ -19,8 +19,8 @@
 - Toggle(**A**): enable/disable retriever
     - *enables the following (individual controls listed after)*:
         - Retriever arm - Toggle(**D-pad-down**)
-        - Roller - Toggle(**D-pad-up**)
-        - Retriever belt - Toggle(**D-pad-right**)
+        - Roller - Hold(**D-pad-up**)
+        - Retriever belt - Hold(**D-pad-right**)
 - Hold(**LB** + **Y**): raise arms at a constant rate
 - Hold(**LB** + **X**): lower arms at a constant rate
 - Hold(**LB**) + **Right-Y**: move arms at a variable rate, determined by the joytsick
