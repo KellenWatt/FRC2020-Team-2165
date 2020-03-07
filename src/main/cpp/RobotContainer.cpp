@@ -45,6 +45,10 @@ RobotContainer::RobotContainer() : controller(0),
 
 }
 
+RobotContainer::~RobotContainer() {
+  delete this->m_autonomousCommand;
+}
+
 void RobotContainer::ConfigureButtonBindings() {
   // Configure your button bindings here
 
@@ -149,5 +153,27 @@ void RobotContainer::ConfigureButtonBindings() {
 frc2::Command* RobotContainer::GetAutonomousCommand() {
   // An example command will be run in autonomous
 
-  return &m_autonomousCommand;
+  return new frc2::SelectCommand<int>(
+    [this] {return 0;},
+    // Do nothing
+    std::pair<int, frc2::SequentialCommandGroup>(0, frc2::SequentialCommandGroup(frc2::InstantCommand())),
+    // Drive off line
+    std::pair<int, frc2::SequentialCommandGroup>(1, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->driveSubsystem.resetEncoder();}),
+                                              frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 36;}))),
+    // Drive backward to goal and dump, then drive back
+    std::pair<int, frc2::SequentialCommandGroup>(2, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->driveSubsystem.resetEncoder();}),
+                                              frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(-0.5, 0);})
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() <= -100;}),
+                                              frc2::InstantCommand([this] {this->bucketSubsystem.raiseBucket(true);}),
+                                              frc2::WaitCommand(2.0_s),
+                                              frc2::InstantCommand([this] {this->bucketSubsystem.raiseBucket(false);}),
+                                              frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
+                                              .WithInterrupt([this] {return this->driveSubsystem.getDistance() >= 36;}))),
+    // Drive forward and pick up balls
+    std::pair<int, frc2::SequentialCommandGroup>(4, frc2::SequentialCommandGroup(frc2::InstantCommand([this] {this->loadSubsystem.fullEnable(true);}),
+                                              frc2::WaitCommand(0.5_s),
+                                              frc2::RunCommand([this] {this->driveSubsystem.adjustedArcadeDrive(0.5, 0);})
+                                              .WithTimeout(10.0_s)))
+  );
 }
