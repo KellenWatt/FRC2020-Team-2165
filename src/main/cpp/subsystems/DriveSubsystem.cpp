@@ -26,7 +26,7 @@ void DriveSubsystem::arcadeDrive(double speed, double rotation) {
 void DriveSubsystem::adjustedArcadeDrive(double speed, double rotation) {
     double rate = -this->gyro.GetRate(); 
 
-    this->drivetrain.ArcadeDrive(speed, (rotation < 0.02 ? rate : rotation)); 
+    this->drivetrain.ArcadeDrive(speed, (abs(rotation) < 0.02 ? rate : rotation)); 
     // magic number comes from DifferentialDrive deadband.
     // Basically, if rotation is supposed to be 0, stabilize forward motion
     // if rate is less than 0.02 degrees per second, we'll be fine, otherwise adjust the rate by some factor
