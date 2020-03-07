@@ -46,13 +46,23 @@ double DriveSubsystem::getAngle() {
     return this->gyro.GetAngle();
 }
 
+bool DriveSubsystem::atAngle(double angle) {
+    return abs(angle - this->gyro.GetAngle()) < 0.5;
+}
+
 double DriveSubsystem::getDistance() {
     return this->encoder.GetDistance();
 }
 
-bool DriveSubsystem::atAngle(double angle) {
-    return abs(angle - this->gyro.GetAngle()) < 0.5;
+void DriveSubsystem::enableBrakes(bool enable) {
+    NeutralMode mode = (enable ? NeutralMode::Brake : NeutralMode::Coast);
+    
+    this->rightFront.SetNeutralMode(mode);
+    this->rightRear.SetNeutralMode(mode);
+    this->leftFront.SetNeutralMode(mode);
+    this->leftRear.SetNeutralMode(mode);
 }
+
 
 void DriveSubsystem::setMaxSpeed(double max) {
     this->drivetrain.SetMaxOutput(max);

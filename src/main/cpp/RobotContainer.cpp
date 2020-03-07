@@ -123,7 +123,7 @@ void RobotContainer::ConfigureButtonBindings() {
   // Photo sensor -> activate/deactivate popper automatically
   frc2::Trigger([this] {return this->bucketSubsystem.hasBall();})
   .WhenActive(frc2::SequentialCommandGroup( // Possibly switch to a WhenInactive, just to see if we can get rid of that first delay
-                frc2::WaitCommand(0.8_s),
+                frc2::WaitCommand(0.5_s),
                 frc2::InstantCommand([this] {this->bucketSubsystem.popArm(true);}, {&(this->bucketSubsystem)}),
                 frc2::WaitCommand(0.5_s),
                 frc2::InstantCommand([this] {this->bucketSubsystem.popArm(false);}, {&(this->bucketSubsystem)})));
@@ -131,9 +131,11 @@ void RobotContainer::ConfigureButtonBindings() {
   // Right stick -> 180 spin
   frc2::JoystickButton(&(this->controller), static_cast<int>(frc::XboxController::Button::kStickRight))
   .WhenActive(frc2::SequentialCommandGroup(
-                frc2::InstantCommand([this] {this->driveSubsystem.resetGyro();}, {&(this->driveSubsystem)}),
-                frc2::RunCommand([this] {this->driveSubsystem.turnToAngleAtSpeed(180, 0.6);}, {&(this->driveSubsystem)}))
-              .WithInterrupt([this] {return this->driveSubsystem.atAngle(180);}), {&(this->driveSubsystem)});
+                frc2::InstantCommand([this] {this->driveSubsystem.resetGyro();
+                                             this->driveSubsystem.enableBrakes(true);}, {&(this->driveSubsystem)}),
+                frc2::RunCommand([this] {this->driveSubsystem.turnToAngleAtSpeed(180, 0.6);}, {&(this->driveSubsystem)})
+                .WithInterrupt([this] {return this->driveSubsystem.atAngle(180);}))
+              .AndThen([this] {this->driveSubsystem.enableBrakes(false);}, {&(this->driveSubsystem)}));
 
 
   // Granular Controls for loader

@@ -40,6 +40,8 @@ public:
 
     double getDistance();
 
+    void enableBrakes(bool enable);
+
     void setMaxSpeed(double max);
     void resetGyro();
     void resetEncoder();
