@@ -41,6 +41,7 @@ RobotContainer::RobotContainer() : controller(0),
   ConfigureButtonBindings();
 
   driveSubsystem.SetDefaultCommand(frc2::RunCommand([this] {
+    this->driveSubsystem.enableBrakes(false);
     this->driveSubsystem.adjustedArcadeDrive(-this->controller.GetY(frc::GenericHID::JoystickHand::kLeftHand),
                                              this->controller.GetX(frc::GenericHID::JoystickHand::kRightHand));
   }, {&(this->driveSubsystem)}));
@@ -134,8 +135,7 @@ void RobotContainer::ConfigureButtonBindings() {
                 frc2::InstantCommand([this] {this->driveSubsystem.resetGyro();
                                              this->driveSubsystem.enableBrakes(true);}, {&(this->driveSubsystem)}),
                 frc2::RunCommand([this] {this->driveSubsystem.turnToAngleAtSpeed(180, 0.6);}, {&(this->driveSubsystem)})
-                .WithInterrupt([this] {return this->driveSubsystem.atAngle(180);}))
-              .AndThen([this] {this->driveSubsystem.enableBrakes(false);}, {&(this->driveSubsystem)}));
+                .WithInterrupt([this] {return this->driveSubsystem.atAngle(180);})));
 
 
   // Granular Controls for loader
